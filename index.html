@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>FOYS — Focus On Your Self</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Josefin+Sans:wght@300;400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+/* ══ DARK MODE (default) ══ */
+:root{
+  --black:#080808;--white:#f4f1ec;--cream:#ede9e1;
+  --gold:#c9a84c;--gold-light:#e8c97a;--gold-dim:rgba(201,168,76,0.15);
+  --dark:#141414;--mid:#1e1e1e;--muted:#888;
+  --bg:var(--black);--surface:var(--dark);--surface2:var(--mid);
+  --text:var(--white);--text2:rgba(244,241,236,.55);--text3:rgba(244,241,236,.3);
+  --border:rgba(201,168,76,.15);--nav-bg:rgba(8,8,8,.97);
+  --prod-overlay:rgba(8,8,8,.92);--hero-bg:#0e0c0a;
+  --stat-desc:rgba(244,241,236,.4);--sz-border:rgba(244,241,236,.1);--sz-color:rgba(244,241,236,.45);
+  --card-bg:var(--black);--footer-bg:var(--black);
+  --logo-filter:invert(1) brightness(10);
+}
+
+/* ══ LIGHT MODE ══ */
+[data-theme="light"]{
+  --black:#f7f4ef;--white:#1a1612;--cream:#2a2420;
+  --gold:#b8942e;--gold-light:#c9a84c;--gold-dim:rgba(184,148,46,0.2);
+  --dark:#ede9e2;--mid:#e2ddd6;--muted:#666;
+  --bg:#f7f4ef;--surface:#ede9e2;--surface2:#e2ddd6;
+  --text:#1a1612;--text2:rgba(26,22,18,.6);--text3:rgba(26,22,18,.35);
+  --border:rgba(184,148,46,.2);--nav-bg:rgba(247,244,239,.97);
+  --prod-overlay:rgba(247,244,239,.88);--hero-bg:#e8e3dc;
+  --stat-desc:rgba(26,22,18,.45);--sz-border:rgba(26,22,18,.15);--sz-color:rgba(26,22,18,.5);
+  --card-bg:#f0ece5;--footer-bg:#ede9e2;
+  --logo-filter:none;
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Josefin Sans',sans-serif;font-weight:300;letter-spacing:.04em;overflow-x:hidden;cursor:none;transition:background .4s,color .4s}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gold)}
+
+/* ══ THEME TOGGLE BUTTON ══ */
+.theme-toggle{
+  width:48px;height:26px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:13px;
+  cursor:none;position:relative;transition:all .35s ease;flex-shrink:0;
+}
+.theme-toggle::before{
+  content:'';position:absolute;top:3px;left:3px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--gold);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),background .3s;
+}
+[data-theme="light"] .theme-toggle::before{transform:translateX(22px)}
+.theme-toggle .icon-sun,.theme-toggle .icon-moon{
+  position:absolute;top:50%;font-size:11px;
+  transform:translateY(-50%);transition:opacity .3s;
+  pointer-events:none;
+}
+.theme-toggle .icon-sun{right:5px;opacity:0}
+.theme-toggle .icon-moon{left:5px;opacity:1}
+[data-theme="light"] .theme-toggle .icon-sun{opacity:1}
+[data-theme="light"] .theme-toggle .icon-moon{opacity:0}
+
+/* ══ WHATSAPP CHOOSER ══ */
+.wa-chooser{
+  position:fixed;bottom:30px;right:30px;z-index:250;
+  display:flex;flex-direction:column;gap:10px;align-items:flex-end;
+}
+.wa-main-btn{
+  width:58px;height:58px;background:#25D366;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:none;box-shadow:0 4px 20px rgba(37,211,102,.35);
+  border:none;transition:transform .3s,box-shadow .3s;
+  font-size:26px;
+}
+.wa-main-btn:hover{transform:scale(1.08);box-shadow:0 8px 28px rgba(37,211,102,.5)}
+.wa-options{
+  display:flex;flex-direction:column;gap:8px;align-items:flex-end;
+  opacity:0;transform:translateY(12px) scale(.95);
+  pointer-events:none;transition:all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.wa-options.show{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
+.wa-option{
+  display:flex;align-items:center;gap:10px;cursor:none;
+  text-decoration:none;
+}
+.wa-option-bubble{
+  background:var(--surface2);color:var(--text);
+  padding:8px 16px;border-radius:20px 20px 4px 20px;
+  font-size:11px;font-weight:700;letter-spacing:.12em;
+  border:1px solid var(--border);
+  white-space:nowrap;transition:background .2s;
+}
+.wa-option:hover .wa-option-bubble{background:var(--gold);color:#000}
+.wa-option-icon{
+  width:40px;height:40px;background:#25D366;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  box-shadow:0 2px 10px rgba(37,211,102,.3);flex-shrink:0;
+}
+.wa-label{
+  font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(244,241,236,.4);text-align:right;margin-bottom:4px;
+}
+[data-theme="light"] .wa-label{color:rgba(26,22,18,.4)}
+
+/* ══ CHECKOUT WHATSAPP CHOOSER ══ */
+.wa-co-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:260;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.wa-co-ov.open{display:flex}
+.wa-co-modal{width:100%;max-width:400px;background:var(--mid);border:1px solid var(--gold-dim);border-radius:12px;padding:28px;position:relative;text-align:center;animation:waPop .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes waPop{from{opacity:0;transform:translateY(24px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+.wa-co-x{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;transition:color .2s}
+.wa-co-x:hover{color:var(--gold)}
+.wa-co-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;color:var(--gold);margin-bottom:6px}
+.wa-co-sub{font-size:12px;color:var(--text2);letter-spacing:.06em;margin-bottom:22px}
+.wa-co-btn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;transition:all .3s;text-decoration:none;margin-bottom:10px}
+.wa-co-btn:hover{background:#25D366;color:#fff;border-color:#25D366;transform:translateY(-2px)}
+.wa-co-btn .waco-ico{width:38px;height:38px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.wa-co-btn .waco-num{flex:1;text-align:left}
+.wa-co-btn .waco-num small{display:block;font-size:10px;font-weight:400;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.wa-co-btn:hover .waco-ico{background:rgba(255,255,255,.25)}
+.wa-co-btn:hover .waco-num small{color:rgba(255,255,255,.75)}
+
+
+/* CURSOR */
+#cur{width:10px;height:10px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+#cur-ring{width:34px;height:34px;border:1px solid rgba(201,168,76,.45);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .12s ease,top .12s ease}
+body *:hover ~ #cur{width:16px;height:16px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:22px 60px;transition:background .4s,padding .4s}
+nav.scrolled{background:var(--nav-bg);backdrop-filter:blur(16px);padding:14px 60px;border-bottom:1px solid var(--gold-dim)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo img{width:44px;height:44px;object-fit:contain;filter:var(--logo-filter)}
+.nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.14em;color:var(--white)}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{color:var(--text);text-decoration:none;font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;opacity:.7;transition:opacity .2s;position:relative;padding-bottom:4px}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s}
+.nav-links a:hover{opacity:1}
+.nav-links a:hover::after{width:100%}
+.nav-actions{display:flex;align-items:center;gap:20px}
+.cart-btn{background:none;border:1px solid var(--gold-dim);color:var(--text);cursor:none;padding:10px 22px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;transition:all .3s;display:flex;align-items:center;gap:8px;position:relative;overflow:hidden}
+.cart-btn::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateX(-101%);transition:transform .35s ease}
+.cart-btn:hover::before{transform:translateX(0)}
+.cart-btn span,.cart-count{position:relative;z-index:1}
+.cart-count{background:var(--gold);color:var(--black);width:18px;height:18px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:none;padding:4px}
+.hamburger span{display:block;width:24px;height:1.5px;background:var(--text);transition:all .3s}
+
+/* HERO */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;position:relative;overflow:hidden}
+.hero-left{display:flex;flex-direction:column;justify-content:center;padding:120px 60px 80px;position:relative;z-index:2}
+.hero-right{position:relative;overflow:hidden}
+.hero-bg-glow{position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 60% 50%,rgba(201,168,76,.05) 0%,transparent 70%);pointer-events:none}
+.hero-eyebrow{font-size:9px;font-weight:700;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:14px;margin-bottom:28px;opacity:0;animation:fadeUp .8s ease .2s forwards}
+.hero-eyebrow::before{content:'';width:36px;height:1px;background:var(--gold)}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(68px,8vw,120px);line-height:.9;letter-spacing:.04em;margin-bottom:10px;opacity:0;animation:fadeUp .9s ease .4s forwards}
+.hero-title .g{color:var(--gold)}
+.hero-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--text2);margin-bottom:48px;letter-spacing:.07em;opacity:0;animation:fadeUp .9s ease .6s forwards}
+.hero-cta{display:flex;gap:14px;opacity:0;animation:fadeUp .9s ease .8s forwards}
+.btn-gold{background:var(--gold);color:#000;padding:16px 38px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;border:none;cursor:none;text-decoration:none;display:inline-block;transition:all .3s;position:relative;overflow:hidden}
+.btn-gold::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.18);transform:translateX(-101%);transition:transform .3s}
+.btn-gold:hover::after{transform:translateX(0)}
+.btn-outline{background:none;color:var(--text);padding:16px 38px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;border:1px solid var(--text3);cursor:none;text-decoration:none;display:inline-block;transition:all .3s}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+/* HERO RIGHT — photo collection */
+.hero-right-inner{width:100%;height:100%;position:relative;background:var(--hero-bg)}
+.hero-main-img{width:100%;height:100%;object-fit:cover;object-position:center;opacity:.9;display:block}
+.hero-logo-overlay{position:absolute;bottom:40px;right:40px;width:90px;opacity:.18}
+.hero-scroll-hint{position:absolute;bottom:36px;left:60px;display:flex;align-items:center;gap:12px;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--text3);z-index:3;opacity:0;animation:fadeIn 1s ease 1.2s forwards}
+.scroll-bar{width:40px;height:1px;background:rgba(201,168,76,.4);animation:scrollPulse 2s ease-in-out infinite}
+
+/* MARQUEE */
+.marquee{background:var(--gold);padding:13px 0;overflow:hidden;white-space:nowrap}
+.marquee-inner{display:inline-flex;animation:marquee 22s linear infinite}
+.mi{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.28em;color:var(--black);padding:0 28px}
+.md{color:rgba(10,10,10,.35);padding:0}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--gold-dim);border-bottom:1px solid var(--gold-dim)}
+.stat{padding:50px 60px;position:relative}
+.stat+.stat::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;background:linear-gradient(to bottom,transparent,var(--gold-dim),transparent)}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--gold);letter-spacing:.04em;line-height:1}
+.stat-label{font-size:9px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;opacity:.5;margin-top:4px}
+.stat-desc{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(244,241,236,.4);margin-top:6px}
+
+/* COLLECTION */
+.collection{padding:110px 60px;background:var(--dark)}
+.sec-label{font-size:9px;font-weight:700;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.sec-label::before{content:'';width:28px;height:1px;background:var(--gold)}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,6vw,80px);letter-spacing:.04em;line-height:.95;margin-bottom:56px}
+.sec-title em{font-style:italic;font-family:'Cormorant Garamond',serif;font-weight:300;color:var(--gold)}
+
+.prod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.prod-card{position:relative;overflow:hidden;background:var(--black);cursor:none;transition:transform .4s}
+.prod-card.feat{grid-row:span 2}
+.prod-img-wrap{width:100%;overflow:hidden;position:relative}
+.prod-card:not(.feat) .prod-img-wrap{aspect-ratio:4/5}
+.prod-card.feat .prod-img-wrap{height:100%;min-height:520px}
+
+/* CSS T-SHIRT VISUAL */
+.tshirt-visual{width:100%;height:100%;min-height:320px;display:flex;align-items:center;justify-content:center;position:relative;transition:transform .7s ease}
+.prod-card:hover .tshirt-visual{transform:scale(1.04)}
+.tshirt-wrap{position:relative;width:220px;height:260px}
+.tshirt-shape{width:100%;height:100%;position:relative}
+.tshirt-svg{width:100%;height:100%;filter:drop-shadow(0 20px 40px rgba(0,0,0,.5))}
+.tshirt-logo-overlay{position:absolute;top:50%;left:50%;transform:translate(-45%,-40%);width:90px;opacity:.85}
+
+.prod-real-img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .7s ease;display:block;min-height:280px}
+.prod-card:hover .prod-real-img{transform:scale(1.05)}
+
+.prod-tag{position:absolute;top:18px;left:18px;background:var(--gold);color:var(--black);font-size:8px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding:5px 12px;z-index:3}
+.prod-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.92) 0%,transparent 50%);z-index:2;pointer-events:none;opacity:0;transition:opacity .4s}
+.prod-card:hover .prod-overlay{opacity:1}
+
+.prod-info{padding:22px 22px 22px;position:relative;z-index:2}
+.prod-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;margin-bottom:3px}
+.prod-sub{font-size:10px;color:var(--muted);letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
+.sizes-row{display:flex;gap:5px;margin-bottom:14px}
+.sz{width:30px;height:30px;background:none;border:1px solid rgba(244,241,236,.1);color:rgba(244,241,236,.45);font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:.05em;cursor:none;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.sz.active,.sz:hover{border-color:var(--gold);color:var(--gold)}
+.sz.out-of-stock{opacity:.25;cursor:not-allowed;border-color:rgba(231,76,60,.3);color:#e74c3c;text-decoration:line-through}
+.prod-bottom{display:flex;align-items:center;justify-content:space-between}
+.prod-price{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold);letter-spacing:.06em}
+.prod-price .cur{font-family:'Josefin Sans',sans-serif;font-size:11px;font-weight:600;vertical-align:top;margin-top:3px;display:inline-block}
+.add-btn{width:42px;height:42px;background:none;border:1px solid rgba(201,168,76,.3);color:var(--gold);cursor:none;font-size:22px;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.add-btn:hover{background:var(--gold);color:var(--black);border-color:var(--gold)}
+
+/* COLOR DOTS */
+.color-dots{display:flex;gap:6px;margin-bottom:10px}
+.cdot{width:14px;height:14px;border-radius:50%;border:2px solid transparent;cursor:none;transition:all .2s}
+.cdot.active,.cdot:hover{border-color:var(--gold);transform:scale(1.2)}
+
+/* BRAND SECTION */
+.brand-sec{padding:120px 60px;background:var(--black);position:relative;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.brand-bg{position:absolute;inset:0;background:radial-gradient(ellipse 50% 70% at 30% 50%,rgba(201,168,76,.04) 0%,transparent 70%);pointer-events:none}
+.brand-img-wrap{position:relative}
+.brand-img{width:100%;aspect-ratio:1;object-fit:cover;display:block;animation:rotateHorizontal 8s ease-in-out infinite}
+.brand-img-frame{position:absolute;inset:-12px;border:1px solid var(--gold-dim);z-index:-1}
+.brand-text{}
+.brand-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(22px,3vw,38px);font-weight:300;line-height:1.45;color:var(--text);opacity:.85;margin-bottom:36px}
+.brand-quote strong{font-style:normal;font-weight:400;color:var(--gold)}
+.brand-desc{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,2vw,24px);font-weight:300;line-height:1.45;color:var(--text);opacity:.85;margin-bottom:36px}
+
+/* LOOKBOOK */
+.lookbook{background:var(--mid);padding:100px 0}
+.lb-header{padding:0 60px;display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px}
+.lb-scroll{display:flex;gap:3px;overflow-x:auto;padding:0 60px;scrollbar-width:none}
+.lb-scroll::-webkit-scrollbar{display:none}
+.lb-item{flex:0 0 260px;aspect-ratio:2/3;overflow:hidden;position:relative;cursor:none}
+.lb-img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease;display:block}
+.lb-item:hover .lb-img{transform:scale(1.06)}
+.lb-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#111 0%,#1a1810 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.lb-num{position:absolute;top:14px;left:14px;font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(244,241,236,.25);letter-spacing:.1em;z-index:2}
+.lb-label{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,rgba(8,8,8,.9),transparent);font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,241,236,.7);z-index:2;transform:translateY(100%);transition:transform .35s}
+.lb-item:hover .lb-label{transform:translateY(0)}
+
+/* COLORS SHOWCASE */
+.colors-sec{padding:100px 60px;background:var(--black)}
+.colors-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-top:56px}
+.color-swatch{aspect-ratio:1/1.4;position:relative;overflow:hidden;cursor:none;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:16px}
+.cs-bg{position:absolute;inset:0;transition:transform .5s}
+.color-swatch:hover .cs-bg{transform:scale(1.06)}
+.cs-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:55%;opacity:.75;transition:opacity .3s,width .3s}
+.color-swatch:hover .cs-logo{opacity:1;width:65%}
+.cs-name{position:relative;z-index:2;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.7);text-align:center}
+
+/* NEWSLETTER */
+.newsletter{background:var(--gold);padding:80px 60px;display:flex;align-items:center;justify-content:space-between;gap:60px}
+.nl-title{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--black);letter-spacing:.04em;line-height:1;margin-bottom:8px}
+.nl-sub{font-size:13px;color:rgba(10,10,10,.55);letter-spacing:.1em}
+.nl-form{display:flex;flex:1}
+.nl-input{flex:1;background:rgba(10,10,10,.12);border:none;border-bottom:2px solid rgba(10,10,10,.25);padding:16px 20px;font-family:'Josefin Sans',sans-serif;font-size:13px;letter-spacing:.08em;color:var(--black);outline:none;transition:border-color .3s}
+.nl-input::placeholder{color:rgba(10,10,10,.35)}
+.nl-input:focus{border-color:var(--black)}
+.nl-btn{background:var(--black);color:var(--gold);border:none;cursor:none;padding:16px 30px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;transition:all .3s}
+.nl-btn:hover{background:#1a1a1a}
+
+/* FOOTER */
+footer{background:var(--black);border-top:1px solid var(--gold-dim);padding:80px 60px 36px}
+.ft{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:60px}
+.ft-logo{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:.1em;margin-bottom:4px}
+.ft-tag{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--gold);letter-spacing:.07em;margin-bottom:20px}
+.ft-p{font-size:13px;color:var(--gold);line-height:1.8;max-width:250px}
+.ft-socials{display:flex;gap:10px;margin-top:28px}
+.ft-soc{width:36px;height:36px;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.05em;transition:all .3s}
+.ft-soc:hover{border-color:var(--gold-light);color:var(--gold-light)}
+.ft-col h4{font-size:9px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.ft-col ul{list-style:none}
+.ft-col li{margin-bottom:10px}
+.ft-col a{color:var(--gold);text-decoration:none;font-size:13px;letter-spacing:.05em;transition:color .2s}
+.ft-col a:hover{color:var(--gold-light)}
+
+/* DELIVERY FORM, RETURNS CHAT, FAQ */
+.modal-content{background:var(--mid);border:1px solid var(--gold-dim);max-width:600px;width:92%;max-height:92vh;overflow-y:auto;padding:44px 36px;position:relative}
+.modal-content h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.06em;margin-bottom:8px}
+.modal-content p{font-size:12px;color:var(--text2);letter-spacing:.06em;margin-bottom:24px;line-height:1.6}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:9px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
+.form-group input,.form-group textarea{width:100%;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Josefin Sans',sans-serif;font-size:14px;letter-spacing:.04em;outline:none;transition:border-color .3s}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--gold)}
+.form-group textarea{min-height:100px;resize:vertical}
+.form-submit{background:var(--gold);color:var(--black);border:none;cursor:pointer;padding:16px 38px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;transition:all .3s;width:100%}
+.form-submit:hover{background:var(--gold-light)}
+.modal-close-btn{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer;transition:color .2s}
+.modal-close-btn:hover{color:var(--gold)}
+
+/* RETOURS CHAT */
+.chat-messages{max-height:300px;overflow-y:auto;margin-bottom:18px;display:flex;flex-direction:column;gap:10px;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:4px}
+.chat-msg{background:var(--surface);padding:12px 16px;border-radius:4px;font-size:13px;letter-spacing:.04em;line-height:1.5;color:var(--text);border-left:3px solid var(--gold)}
+.chat-msg .chat-author{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.chat-msg .chat-date{font-size:9px;color:var(--text3);margin-top:4px}
+.chat-msg .chat-del{float:right;background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;line-height:1}
+
+/* FAQ */
+.faq-list{display:flex;flex-direction:column;gap:6px}
+.faq-item{border:1px solid var(--border);background:var(--surface2);overflow:hidden}
+.faq-q{padding:16px 20px;font-size:13px;font-weight:600;letter-spacing:.06em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s;color:var(--text)}
+.faq-q:hover{background:var(--surface)}
+.faq-q .faq-arrow{transition:transform .3s;font-size:12px;color:var(--gold)}
+.faq-item.open .faq-q .faq-arrow{transform:rotate(180deg)}
+.faq-a{padding:0 20px;max-height:0;overflow:hidden;transition:max-height .4s ease,padding .4s ease;font-size:13px;color:var(--text2);letter-spacing:.04em;line-height:1.7}
+.faq-item.open .faq-a{max-height:300px;padding:0 20px 18px}
+.ft-bottom{border-top:1px solid rgba(201,168,76,.07);padding-top:28px;display:flex;align-items:center;justify-content:space-between}
+.ft-bottom p{font-size:11px;color:var(--gold);opacity:.6;letter-spacing:.1em}
+.ft-bottom .g{color:var(--gold)}
+
+/* CART PANEL */
+.cart-panel{position:fixed;top:0;right:-440px;width:440px;height:100vh;background:var(--mid);border-left:1px solid var(--gold-dim);z-index:200;transition:right .45s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.cart-panel.open{right:0}
+.cart-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:199;display:none;opacity:0;transition:opacity .4s}
+.cart-ov.open{display:block;opacity:1}
+.cart-hd{padding:30px 30px 22px;border-bottom:1px solid rgba(201,168,76,.1);display:flex;align-items:center;justify-content:space-between}
+.cart-hd-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.1em}
+.cart-x{background:none;border:none;color:var(--white);font-size:24px;cursor:none;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:color .2s}
+.cart-x:hover{color:var(--gold)}
+.cart-body{flex:1;overflow-y:auto;padding:20px 30px}
+.cart-empty-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;color:rgba(244,241,236,.25)}
+.cart-empty-wrap .ico{font-size:52px;opacity:.15}
+.cart-empty-wrap p{font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+.cart-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid rgba(244,241,236,.05)}
+.ci-img{width:68px;height:84px;background:#111;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.ci-img img{width:100%;height:100%;object-fit:cover}
+.ci-img .ci-ph{font-size:28px;opacity:.3}
+.ci-info{flex:1}
+.ci-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;margin-bottom:3px}
+.ci-sz{font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.ci-qty{display:flex;align-items:center;gap:10px}
+.qb{width:26px;height:26px;background:none;border:1px solid rgba(244,241,236,.12);color:var(--white);cursor:none;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.qb:hover{border-color:var(--gold);color:var(--gold)}
+.qn{font-size:14px;font-weight:600;min-width:18px;text-align:center}
+.ci-price{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:.06em;align-self:flex-end}
+.cart-ft{padding:20px 30px 30px;border-top:1px solid rgba(201,168,76,.1)}
+.cart-total-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.cart-total-lbl{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
+.cart-total-val{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--gold);letter-spacing:.06em}
+.co-btn{width:100%;background:var(--gold);color:var(--black);border:none;cursor:none;padding:17px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;transition:all .3s}
+.co-btn:hover{background:var(--gold-light)}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:150;display:none;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+.modal-ov.open{display:flex}
+.modal{background:var(--mid);border:1px solid var(--gold-dim);max-width:880px;width:92%;max-height:92vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr}
+.modal-img-side{overflow:hidden;background:#0e0e0e}
+.modal-img-side img{width:100%;height:100%;object-fit:cover;display:block}
+.modal-ph{width:100%;height:100%;min-height:360px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#111,#1a1810)}
+.modal-body{padding:44px 36px;display:flex;flex-direction:column}
+.modal-close{align-self:flex-end;background:none;border:none;color:var(--white);font-size:26px;cursor:none;margin-bottom:28px;transition:color .2s}
+.modal-close:hover{color:var(--gold)}
+.modal-cat{font-size:9px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.modal-name{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.06em;margin-bottom:8px}
+.modal-price{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--gold);letter-spacing:.06em;margin-bottom:20px}
+.modal-desc{font-size:13px;color:rgba(244,241,236,.5);line-height:1.85;letter-spacing:.04em;margin-bottom:28px;flex:1}
+.modal-sz-lbl{font-size:9px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:rgba(244,241,236,.45);margin-bottom:10px}
+.modal-add{width:100%;background:var(--gold);color:var(--black);border:none;cursor:none;padding:17px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;transition:all .3s;margin-top:22px}
+.modal-add:hover{background:var(--gold-light)}
+
+/* TOAST */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:var(--black);padding:13px 28px;font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;z-index:300;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;margin-bottom:40px;flex-wrap:wrap}
+.filter-btn{background:none;border:1px solid var(--border);color:var(--text2);padding:10px 24px;font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:none;transition:all .3s}
+.filter-btn:hover,.filter-btn.active{background:var(--gold);color:var(--black);border-color:var(--gold)}
+
+/* ADMIN PANEL */
+.admin-btn{background:none;border:1px solid var(--gold-dim);color:var(--gold);cursor:none;width:36px;height:36px;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.admin-btn:hover{background:var(--gold);color:var(--black)}
+.admin-panel{position:fixed;top:0;right:-520px;width:520px;height:100vh;background:var(--mid);border-left:1px solid var(--gold-dim);z-index:200;transition:right .45s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.admin-panel.open{right:0}
+.admin-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:199;display:none;opacity:0;transition:opacity .4s}
+.admin-ov.open{display:block;opacity:1}
+.admin-hd{padding:24px 24px 18px;border-bottom:1px solid rgba(201,168,76,.1);display:flex;align-items:center;justify-content:space-between}
+.admin-hd-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;color:var(--gold)}
+.admin-x{background:none;border:none;color:var(--white);font-size:22px;cursor:none;width:36px;height:36px;transition:color .2s}
+.admin-x:hover{color:var(--gold)}
+.admin-tabs{display:flex;border-bottom:1px solid rgba(201,168,76,.1)}
+.admin-tab{flex:1;padding:14px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text2);font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:none;transition:all .3s}
+.admin-tab.active,.admin-tab:hover{color:var(--gold);border-bottom-color:var(--gold)}
+.admin-body{flex:1;overflow-y:auto;padding:20px 24px}
+.admin-tab-content{display:none}
+.admin-tab-content.active{display:block}
+.admin-section{margin-bottom:24px}
+.admin-section h4{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.08em;color:var(--gold);margin-bottom:14px}
+.admin-form{display:flex;flex-direction:column;gap:10px}
+.admin-row{display:flex;gap:10px}
+.admin-row .admin-inp{flex:1}
+.admin-inp{width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Josefin Sans',sans-serif;font-size:13px;letter-spacing:.04em;outline:none;transition:border-color .3s}
+.admin-inp:focus{border-color:var(--gold)}
+.admin-ta{min-height:80px;resize:vertical}
+.admin-inp::placeholder{color:var(--text3)}
+.admin-check{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);letter-spacing:.06em;cursor:none}
+.admin-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold)}
+.admin-btn-primary{background:var(--gold);color:var(--black);border:none;cursor:none;padding:14px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;transition:all .3s}
+.admin-upload{border:2px dashed var(--border);padding:8px;border-radius:4px;text-align:center;transition:border-color .3s}
+.admin-upload:hover{border-color:var(--gold)}
+.admin-upload-area{min-height:80px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column;gap:4px}
+.admin-upload-area img{border-radius:2px}
+#afUploadText{font-size:11px;color:var(--text3);letter-spacing:.06em}
+.admin-btn-primary:hover{background:var(--gold-light)}
+.admin-help{font-size:11px;color:var(--text3);letter-spacing:.04em;margin-bottom:12px}
+.admin-prod-list{display:flex;flex-direction:column;gap:4px}
+.admin-prod-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);font-size:12px;color:var(--text)}
+.admin-prod-item .api-name{font-weight:600;flex:1}
+.admin-prod-item .api-price{color:var(--gold);margin-right:12px;font-family:'Bebas Neue',sans-serif;font-size:16px}
+.admin-del-btn{background:none;border:none;color:#e74c3c;cursor:none;font-size:16px;padding:4px 8px;transition:color .2s}
+.admin-del-btn:hover{color:#ff6b6b}
+.stock-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.stock-item .si-name{min-width:120px;font-weight:600;font-size:13px;color:var(--text)}
+.stock-item .si-sizes{display:flex;gap:6px;flex-wrap:wrap}
+.si-sz{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2)}
+.si-sz input{width:48px;padding:4px 6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Josefin Sans',sans-serif;font-size:12px;text-align:center;outline:none}
+.si-sz input:focus{border-color:var(--gold)}
+.promo-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.promo-item .pi-name{min-width:140px;font-weight:600;font-size:13px;color:var(--text)}
+.promo-item .pi-price{font-size:12px;color:var(--text2)}
+.promo-item input{width:100px;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Josefin Sans',sans-serif;font-size:13px;text-align:center;outline:none}
+.promo-item input:focus{border-color:var(--gold)}
+.promo-item .pi-orig{font-size:11px;color:var(--text3);text-decoration:line-through;margin-left:6px}
+@media(max-width:600px){.admin-panel{width:100%;right:-100%}}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes scrollPulse{0%,100%{opacity:.35;width:36px}50%{opacity:1;width:56px}}
+@keyframes rotateHorizontal{0%,100%{transform:rotateY(0deg)}50%{transform:rotateY(180deg)}}
+
+/* MOBILE */
+@media(max-width:900px){
+  nav{padding:18px 20px}nav.scrolled{padding:12px 20px}
+  .nav-links{display:none}.hamburger{display:flex}
+  .hero{grid-template-columns:1fr}
+  .hero-left{padding:100px 20px 60px}
+  .hero-right{display:none}
+  .stats{grid-template-columns:1fr}
+  .stat{padding:36px 20px}.stat+.stat::before{top:0;left:20%;right:20%;width:auto;height:1px;bottom:auto}
+  .collection{padding:70px 20px}
+  .prod-grid{grid-template-columns:1fr 1fr;gap:2px}
+  .prod-card.feat{grid-row:span 1}
+  .brand-sec{grid-template-columns:1fr;padding:70px 20px;gap:40px}
+  .colors-grid{grid-template-columns:repeat(4,1fr)}
+  .newsletter{flex-direction:column;padding:60px 20px;gap:28px}
+  .nl-form{flex-direction:column}
+  footer{padding:60px 20px 28px}
+  .ft{grid-template-columns:1fr 1fr;gap:36px}
+  .ft-brand{grid-column:span 2}
+  .lb-header,.lb-scroll{padding-left:20px;padding-right:20px}
+  .cart-panel{width:100%;right:-100%}
+  .modal{grid-template-columns:1fr}
+  .modal-img-side{aspect-ratio:4/3}
+  .hero-cta{flex-direction:column}
+}
+@media(max-width:540px){
+  .prod-grid{grid-template-columns:1fr 1fr}
+  .colors-grid{grid-template-columns:repeat(4,1fr)}
+  .ft{grid-template-columns:1fr}
+  .ft-brand{grid-column:span 1}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<div class="toast" id="toast">✓ Ajouté au panier</div>
+<div class="cart-ov" id="cartOv" onclick="closeCart()"></div>
+
+<!-- CART -->
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-hd">
+    <div class="cart-hd-title">Mon Panier</div>
+    <button class="cart-x" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty-wrap" id="cartEmpty">
+      <div class="ico">🛒</div>
+      <p>Votre panier est vide</p>
+    </div>
+  </div>
+  <div class="cart-ft">
+    <div class="cart-total-row">
+      <span class="cart-total-lbl">Total</span>
+      <span class="cart-total-val" id="cartTotal">0 FCFA</span>
+    </div>
+    <button class="co-btn" onclick="checkoutWA()">🛒 Commander via WhatsApp</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="modalOv" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-img-side" id="modalImgSide">
+      <div class="modal-ph">
+        <img src="images/hero.jpg" alt="FOYS" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'height:360px;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.3\'>FOYS</div>'">
+      </div>
+    </div>
+    <div class="modal-body">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-cat" id="mCat">FOYS Collection</div>
+      <div class="modal-name" id="mName"></div>
+      <div class="modal-price" id="mPrice"></div>
+      <p class="modal-desc" id="mDesc"></p>
+      <div class="modal-sz-lbl">Choisir une taille</div>
+      <div class="sizes-row" id="mSizes"></div>
+      <button class="modal-add" id="modalAddBtn">Ajouter au panier</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <img src="images/logo.png" alt="FOYS Logo" style="width:44px;height:44px;object-fit:contain;border-radius:2px;filter:brightness(1.1)" onerror="this.style.background='var(--gold)';this.style.padding='4px';this.alt='FOYS'">
+    <span class="nav-logo-text">FOYS</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#collection">Collection</a></li>
+    <li><a href="#couleurs">Couleurs</a></li>
+    <li><a href="#brand">Marque</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Mode clair / sombre">
+      <span class="icon-moon">🌙</span>
+      <span class="icon-sun">☀️</span>
+    </button>
+    <button class="cart-btn" onclick="openCart()">
+      <span>Panier</span>
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <button class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </button>
+    <button class="admin-btn" id="adminBtn" onclick="toggleAdmin()" title="Admin" style="display:none">⚙</button>
+  </div>
+</nav>
+
+<!-- WHATSAPP FLOTTANT AVEC 2 NUMEROS -->
+<div class="wa-chooser" id="waChooser">
+  <div class="wa-options" id="waOptions">
+    <div class="wa-label">Choisir un contact</div>
+    <a class="wa-option" href="#" onclick="orderTo('221774408219');return false">
+      <div class="wa-option-bubble">+221 77 440 82 19</div>
+      <div class="wa-option-icon">📱</div>
+    </a>
+    <a class="wa-option" href="#" onclick="orderTo('221781629372');return false">
+      <div class="wa-option-bubble">+221 78 162 93 72</div>
+      <div class="wa-option-icon">📱</div>
+    </a>
+  </div>
+  <button class="wa-main-btn" id="waMainBtn" onclick="toggleWA()">💬</button>
+</div>
+
+<!-- CHECKOUT WHATSAPP CHOOSER MODAL -->
+<div class="wa-co-ov" id="waCoOv" onclick="if(event.target===this)closeWACo()">
+  <div class="wa-co-modal">
+    <button class="wa-co-x" onclick="closeWACo()">✕</button>
+    <div class="wa-co-title">Commander via WhatsApp</div>
+    <div class="wa-co-sub">Choisissez le numéro de votre choix</div>
+    <div id="waCoList"></div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg-glow"></div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">Collection 2026</div>
+    <h1 class="hero-title">
+      FOCUS<br>
+      <span class="g">ON YOUR</span><br>
+      SELF
+    </h1>
+    <p class="hero-sub">Porte ta vision. Affirme ton identité.</p>
+    <div class="hero-cta">
+      <a href="#collection" class="btn-gold">Explorer la collection</a>
+      <a href="#brand" class="btn-outline">Notre histoire</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-right-inner">
+      <img src="images/hero.jpg" alt="FOYS T-Shirts Collection" class="hero-main-img" onerror="this.style.background='#111';this.style.objectFit='contain';this.style.padding='40px'">
+    </div>
+  </div>
+  <div class="hero-scroll-hint">
+    <span class="scroll-bar"></span>
+    Découvrir
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-inner" id="mq">
+    <span class="mi">FOCUS ON YOUR SELF</span><span class="mi md">◆</span>
+    <span class="mi">FOYS COLLECTION 2025</span><span class="mi md">◆</span>
+    <span class="mi">STYLE AUTHENTIQUE</span><span class="mi md">◆</span>
+    <span class="mi">QUALITÉ PREMIUM</span><span class="mi md">◆</span>
+    <span class="mi">LOUP GÉOMÉTRIQUE</span><span class="mi md">◆</span>
+    <span class="mi">FOCUS ON YOUR SELF</span><span class="mi md">◆</span>
+    <span class="mi">FOYS COLLECTION 2025</span><span class="mi md">◆</span>
+    <span class="mi">STYLE AUTHENTIQUE</span><span class="mi md">◆</span>
+    <span class="mi">QUALITÉ PREMIUM</span><span class="mi md">◆</span>
+    <span class="mi">LOUP GÉOMÉTRIQUE</span><span class="mi md">◆</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">7</div>
+    <div class="stat-label">Coloris disponibles</div>
+    <div class="stat-desc">Noir, gris, navy, bordeaux, beige, vert, bleu</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">100%</div>
+    <div class="stat-label">Coton Premium</div>
+    <div class="stat-desc">Matières soigneusement sélectionnées pour ton confort</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">48H</div>
+    <div class="stat-label">Livraison Rapide</div>
+    <div class="stat-desc">Expédition soignée partout au Sénégal</div>
+  </div>
+</div>
+
+<!-- COLLECTION -->
+<section class="collection" id="collection">
+  <div class="sec-label">La Collection</div>
+  <h2 class="sec-title">T-Shirts <em>FOYS</em></h2>
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-filter="tous">Tous</button>
+    <button class="filter-btn" data-filter="tshirt">T-Shirts</button>
+    <button class="filter-btn" data-filter="nouveautes">Nouveautés</button>
+    <button class="filter-btn" data-filter="exclusif">Éditions Limitées</button>
+    <button class="filter-btn" data-filter="promo">Promotions</button>
+  </div>
+  <div class="prod-grid" id="prodGrid"></div>
+</section>
+
+<!-- COLORS SHOWCASE -->
+<section class="colors-sec" id="couleurs">
+  <div class="sec-label">Tous les coloris</div>
+  <h2 class="sec-title">8 <em>Couleurs</em></h2>
+  <div class="colors-grid" id="colorsGrid"></div>
+</section>
+
+<!-- BRAND -->
+<section class="brand-sec" id="brand">
+  <div class="brand-bg"></div>
+  <div class="brand-img-wrap">
+    <img src="images/logo.png" alt="FOYS Logo" class="brand-img" onerror="this.style.background='#111';this.style.padding='40px';this.style.objectFit='contain'">
+    <div class="brand-img-frame"></div>
+  </div>
+  <div class="brand-text">
+    <div class="sec-label">Notre Identité</div>
+    <h2 class="sec-title" style="margin-bottom:28px">L'<em>Esprit</em><br>FOYS</h2>
+    <div class="brand-divider"></div>
+    <p class="brand-desc">
+      Dans un monde de distractions constantes, où l'attention est souvent dispersée, il devient crucial de réorienter notre énergie et notre esprit vers ce qui est véritablement important. La concentration sur soi-même n'est pas de l'égoïsme mais une profonde compréhension de soi.
+    </p>
+    <p class="brand-quote">
+      FOYS n'est pas qu'une marque —<br>
+      c'est un <strong>état d'esprit</strong>.<br>
+      Le loup, solitaire et libre,<br>
+      symbole de ceux qui se <strong>choisissent</strong>.
+    </p>
+    <a href="#collection" class="btn-gold">Découvrir la collection</a>
+  </div>
+</section>
+
+<!-- LOOKBOOK -->
+<div class="lookbook" id="lookbook">
+  <div class="lb-header">
+    <div>
+      <div class="sec-label">Lookbook</div>
+      <h2 class="sec-title" style="margin-bottom:0">Porte-le <em>fièrement</em></h2>
+    </div>
+    <a href="#collection" class="btn-outline">Voir tout</a>
+  </div>
+  <div class="lb-scroll" id="lbScroll"></div>
+</div>
+
+<!-- NEWSLETTER -->
+<div class="newsletter">
+  <div>
+    <h3 class="nl-title">Restez dans<br>le mouvement</h3>
+    <p class="nl-sub">Drops exclusifs, nouveautés & offres privées</p>
+  </div>
+  <div class="nl-form">
+    <input type="email" class="nl-input" placeholder="Votre adresse email" id="nlInput"/>
+    <button class="nl-btn" onclick="subscribNL()">S'inscrire</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="ft">
+    <div class="ft-brand">
+      <div class="ft-logo">FOYS</div>
+      <div class="ft-tag">Focus On Your Self</div>
+      <p class="ft-p">Une marque née pour ceux qui se choisissent, qui s'assument et portent leur vision avec fierté. Le loup en toi ne dort jamais.</p>
+      <div class="ft-socials">
+        <a href="https://www.instagram.com/mindset_foys?igsh=MWVkYmQzbmNrYjMycg==" class="ft-soc">IG</a>
+        <a href="https://www.tiktok.com/@focusonyourself999?_r=1&_t=ZS-98nSPfb1Lkn" class="ft-soc" target="_blank" rel="noopener">TK</a>
+        <a href="#" class="ft-soc">FB</a>
+        <a href="774408219" class="ft-soc" onclick="toggleWA();return false">WA</a>
+      </div>
+    </div>
+    <div class="ft-col">
+      <h4>Boutique</h4>
+      <ul>
+        <li><a href="#" onclick="goToFilter('nouveautes');return false">Nouveautés</a></li>
+        <li><a href="#" onclick="goToFilter('tshirt');return false">T-Shirts</a></li>
+        <li><a href="#" onclick="goToFilter('exclusif');return false">Éditions Limitées</a></li>
+        <li><a href="#" onclick="goToFilter('promo');return false">Promotions</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Service</h4>
+      <ul>
+        <li><a href="#" onclick="openDelivery();return false">Livraison</a></li>
+        <li><a href="#" onclick="openRetours();return false">Retours & Avis</a></li>
+        <li><a href="#" onclick="openFAQ();return false">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="https://wa.me/774408219" onclick="toggleWA();return false">WhatsApp</a></li>
+        <li><a href="https://www.instagram.com/mindset_foys?igsh=MWVkYmQzbmNrYjMycg==">Instagram DM</a></li>
+        <li><a href="ababacarloum99@gmail.com">Email</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <p>© 2026 <span class="g">FOYS</span> — Tous droits réservés</p>
+    <p>Focus On Your Self — Made with 🧠</p>
+  </div>
+</footer>
+
+<!-- DELIVERY MODAL -->
+<div class="modal-ov" id="deliveryOv" onclick="closeDelivery(event)">
+  <div class="modal-content">
+    <button class="modal-close-btn" onclick="closeDelivery()">✕</button>
+    <h2>Livraison</h2>
+    <p>Remplissez vos coordonnées pour finaliser votre commande. Nous vous contacterons sous 48h.</p>
+    <div class="form-group">
+      <label>Nom</label>
+      <input type="text" id="delNom" placeholder="Votre nom">
+    </div>
+    <div class="form-group">
+      <label>Prénom</label>
+      <input type="text" id="delPrenom" placeholder="Votre prénom">
+    </div>
+    <div class="form-group">
+      <label>Lieu de livraison</label>
+      <input type="text" id="delLieu" placeholder="Ville, quartier, adresse">
+    </div>
+    <div class="form-group">
+      <label>Téléphone</label>
+      <input type="tel" id="delTel" placeholder="77 XXX XX XX">
+    </div>
+    <button class="form-submit" onclick="submitDelivery()">Confirmer la commande</button>
+  </div>
+</div>
+
+<!-- RETOURS MODAL -->
+<div class="modal-ov" id="retoursOv" onclick="closeRetours(event)">
+  <div class="modal-content">
+    <button class="modal-close-btn" onclick="closeRetours()">✕</button>
+    <h2>Retours & Avis</h2>
+    <p>Laissez un commentaire sur votre expérience ou demandez un retour. Nous vous répondrons rapidement.</p>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="form-group">
+      <label>Votre message</label>
+      <textarea id="chatInput" placeholder="Écrivez votre message ici..."></textarea>
+    </div>
+    <button class="form-submit" onclick="submitChat()">Envoyer</button>
+  </div>
+</div>
+
+<!-- FAQ MODAL -->
+<div class="modal-ov" id="faqOv" onclick="closeFAQ(event)">
+  <div class="modal-content">
+    <button class="modal-close-btn" onclick="closeFAQ()">✕</button>
+    <h2>FAQ — Développement Personnel</h2>
+    <p>Des réponses à vos questions sur la croissance personnelle et la philosophie FOYS.</p>
+    <div class="faq-list" id="faqList"></div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-ov" id="adminOv" onclick="closeAdmin(event)"></div>
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-hd">
+    <div class="admin-hd-title">⚙ Admin FOYS</div>
+    <button class="admin-x" onclick="closeAdmin()">✕</button>
+  </div>
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="prod" onclick="switchAdminTab('prod')">Produits</button>
+    <button class="admin-tab" data-tab="stock" onclick="switchAdminTab('stock')">Stock</button>
+    <button class="admin-tab" data-tab="promo" onclick="switchAdminTab('promo')">Promos</button>
+  </div>
+  <div class="admin-body">
+    <!-- TAB PRODUITS -->
+    <div class="admin-tab-content active" id="adminTabProd">
+      <div class="admin-section">
+        <h4>Ajouter un produit</h4>
+        <div class="admin-form">
+          <input class="admin-inp" id="afName" placeholder="Nom (ex: FOYS NOIR)">
+          <input class="admin-inp" id="afSub" placeholder="Sous-titre (ex: Edition Signature)">
+          <div class="admin-row">
+            <input class="admin-inp" id="afPrice" type="number" placeholder="Prix (ex: 12500)">
+            <input class="admin-inp" id="afTag" placeholder="Tag (ex: Nouveau)">
+          </div>
+          <div class="admin-row">
+            <input class="admin-inp" id="afColor" placeholder="Couleur hex (ex: #111111)">
+            <input class="admin-inp" id="afColorName" placeholder="Nom couleur (ex: Noir)">
+          </div>
+          <select class="admin-inp" id="afCat">
+            <option value="tshirt">T-Shirt</option>
+            <option value="accessoire">Accessoire</option>
+            <option value="sport">Sport</option>
+            <option value="autre">Autre</option>
+          </select>
+          <div class="admin-upload">
+            <div class="admin-upload-area" id="afUploadArea" onclick="document.getElementById('afFileInput').click()">
+              <span id="afUploadText">📸 Cliquer pour ajouter une photo</span>
+              <img id="afPreview" style="display:none;max-width:100%;max-height:160px;object-fit:contain">
+            </div>
+            <input type="file" id="afFileInput" accept="image/*" style="display:none" onchange="adminPreviewFile(this)">
+            <div class="admin-row" style="margin-top:4px">
+              <input class="admin-inp" id="afImg" placeholder="Ou coller un chemin/URL (ex: images/noir.jpg)" style="font-size:11px">
+              <button class="admin-inp" id="afClearImg" type="button" onclick="adminClearImage()" style="flex:0;padding:12px 14px;cursor:pointer">✕</button>
+            </div>
+          </div>
+          <input class="admin-inp" id="afSizes" placeholder="Tailles (ex: S,M,L,XL ou Unique)">
+          <textarea class="admin-inp admin-ta" id="afDesc" placeholder="Description du produit"></textarea>
+          <label class="admin-check"><input type="checkbox" id="afFeat"> Mettre en avant (feat)</label>
+          <label class="admin-check"><input type="checkbox" id="afOos"> Non disponible (masquer la vente)</label>
+          <button class="admin-btn-primary" onclick="adminAddProduct()">➕ Ajouter le produit</button>
+        </div>
+      </div>
+      <div class="admin-section">
+        <h4>Produits existants</h4>
+        <div class="admin-prod-list" id="adminProdList"></div>
+      </div>
+    </div>
+    <!-- TAB STOCK -->
+    <div class="admin-tab-content" id="adminTabStock">
+      <div class="admin-section">
+        <label class="admin-check" style="font-size:14px;font-weight:600"><input type="checkbox" id="stockModeToggle" onchange="toggleStockMode()"> Activer le mode Stock (quantités limitées)</label>
+        <p class="admin-help">Quand le stock est actif, les produits en rupture seront désactivés.</p>
+      </div>
+      <div class="admin-section" id="stockSection">
+        <h4>Stock par produit</h4>
+        <div id="stockList"></div>
+      </div>
+    </div>
+    <!-- TAB PROMOS -->
+    <div class="admin-tab-content" id="adminTabPromo">
+      <div class="admin-section">
+        <h4>Prix promotionnels</h4>
+        <p class="admin-help">Définissez un prix promotionnel pour chaque produit. Laissez vide pour utiliser le prix normal.</p>
+        <div id="promoList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ───── DATA ───── */
+// Load products from localStorage or defaults
+const DATA_VERSION='foys-v2';
+function loadProducts(){
+  try{
+    const saved=localStorage.getItem('foys-products');
+    if(saved){
+      const arr=JSON.parse(saved);
+      if(arr.version===DATA_VERSION)return arr.products;
+    }
+  }catch(e){}
+  return null;
+}
+function saveProducts(){
+  localStorage.setItem('foys-products',JSON.stringify({version:DATA_VERSION,products:PRODUCTS}));
+}
+const DEFAULT_PRODUCTS = [
+  {id:1,name:'FOYS NOIR',sub:'Edition Signature',price:10000,tag:'Bestseller',cat:'tshirt',
+   color:'#111111',colorName:'Noir',
+   desc:'Le classique fondateur. Noir profond, logo loup centré en blanc impeccable. Coton 100% premium, coupe droite légèrement oversize. La pièce incontournable de toute garde-robe FOYS.',
+   sizes:['XS','S','M','L','XL','XXL'],feat:true,
+   img:'images/noir.jpg'},
+  {id:2,name:'FOYS BLANC ',sub:'Urban Essential',price:10000,tag:null,cat:'tshirt',
+   color:'#4a4a4a',colorName:'Gris',
+   desc:'Le gris chiné intemporel. Sobre, polyvalent, toujours juste. Le t-shirt que tu portes partout sans te poser de questions.',
+   sizes:['S','M','L','XL'],feat:false,
+   img:'images/gris.jpg'},
+  {id:3,name:'FOYS NAVY',sub:'Deep Blue Edition',price:10000,tag:'Nouveau',cat:'tshirt',
+   color:'#1a2744',colorName:'Navy',
+   desc:'Le navy profond FOYS. Une couleur qui inspire le calme et la confiance. Logo blanc contrastant pour un résultat élégant.',
+   sizes:['XS','S','M','L','XL'],feat:false,
+   img:'images/navy.jpg'},
+  {id:4,name:'FOYS BORDEAUX',sub:'Prestige Edition',price:10000,tag:'Exclusif',cat:'tshirt',
+   color:'#5c1a28',colorName:'Bordeaux',
+   desc:'La couleur des audacieux. Rouge bordeaux intense, logo blanc en relief — une pièce qui commande le respect.',
+   sizes:['S','M','L','XL','XXL'],feat:false,
+   img:'images/bordeaux.jpg'},
+  {id:6,name:'FOYS BEIGE',sub:'Naturel Edition',price:10000,tag:null,cat:'tshirt',
+   color:'#d4c5a9',colorName:'Beige',
+   desc:'Le beige naturel et épuré. Une teinte douce qui s\'accorde avec tout. L\'élégance dans la simplicité.',
+   sizes:['S','M','L','XL','XXL'],feat:false,
+   img:'images/beige.jpg'},
+  {id:7,name:'FOYS VERT',sub:'Nature Edition',price:10000,tag:null,cat:'tshirt',
+   color:'#2d5a3d',colorName:'Vert',
+   desc:'Le vert profond inspiré de la nature. Une couleur unique qui évoque la fraîcheur et l\'authenticité.',
+   sizes:['S','M','L','XL'],feat:false,
+   img:'images/vert.jpg'},
+  {id:8,name:'FOYS BLEU',sub:'Ciel Edition',price:10000,tag:null,cat:'tshirt',
+   color:'#4a7da8',colorName:'Bleu',
+   desc:'Le bleu ciel FOYS. Léger, aérien, parfait pour les journées ensoleillées. Un style décontracté et raffiné.',
+   sizes:['S','M','L','XL'],feat:false,
+   img:'images/bleu.jpg'},
+  {id:9,name:'BRACELET FOYS',sub:'Accessoire Signature',price:7500,tag:'Nouveau',cat:'accessoire',
+   color:'#8a6f3c',colorName:'Bracelet',
+   desc:'Le bracelet FOYS en chaîne dorée. Un accessoire élégant pour accompagner ton t-shirt. Style premium, fabrication soignée.',
+    sizes:['Unique'],feat:false,oos:true,
+    img:'images/bracelet.jpg'},
+  {id:10,name:'BRACELET FOYS NOIR',sub:'Accessoire Noir',price:1500,tag:'Nouveau',cat:'accessoire',
+    color:'#1a1a1a',colorName:'Bracelet Noir',
+    desc:'Le bracelet FOYS en version noire. Élégant et discret, parfait pour un look sobre et sophistiqué.',
+    sizes:['Unique'],feat:false,oos:true,
+    img:'images/bracelet-noire.jpg'},
+  {id:11,name:'TENUE SPORT FOYS',sub:'Performance Edition',price:15000,tag:'Nouveau',cat:'sport',
+    color:'#1a1a1a',colorName:'Tenue Sport',
+    desc:'La tenue sport FOYS. Confort et style pour tes séances d\'entraînement. Tissu technique respirant, coupe adaptée à l\'effort. Affirme ton style même en sport.',
+    sizes:['S','M','L','XL','XXL'],feat:false,oos:true,
+    img:'images/sport.jpg'},
+];
+
+const PRODUCTS = loadProducts() || DEFAULT_PRODUCTS;
+
+const COLORS = [
+  {name:'Noir',hex:'#111111'},{name:'Gris',hex:'#4a4a4a'},{name:'Navy',hex:'#1a2744'},
+  {name:'Bordeaux',hex:'#5c1a28'},{name:'Beige',hex:'#d4c5a9'},
+  {name:'Vert',hex:'#2d5a3d'},{name:'Bleu',hex:'#4a7da8'},
+];
+
+const LOOKBOOK_COLORS = ['#111111','#4a4a4a','#1a2744','#5c1a28','#d4c5a9','#2d5a3d','#4a7da8','#8a6f3c','#1a1a1a'];
+const LOOKBOOK_NAMES = ['Signature Noir','Urban Gris','Deep Navy','Bordeaux Prestige','Beige Naturel','Vert Nature','Bleu Ciel','Bracelet FOYS','Bracelet FOYS Noir'];
+
+let cart=[], curModal=null, curSize=null, sizeMap={};
+
+/* ───── THEME ───── */
+function toggleTheme(){
+  const html=document.documentElement;
+  const isLight=html.getAttribute('data-theme')==='light';
+  html.setAttribute('data-theme',isLight?'dark':'light');
+  localStorage.setItem('foys-theme',isLight?'dark':'light');
+}
+(function initTheme(){
+  const saved=localStorage.getItem('foys-theme')||'dark';
+  document.documentElement.setAttribute('data-theme',saved);
+})();
+
+/* ───── WHATSAPP ───── */
+let waOpen=false;
+function toggleWA(){
+  waOpen=!waOpen;
+  document.getElementById('waOptions').classList.toggle('show',waOpen);
+  document.getElementById('waMainBtn').textContent=waOpen?'✕':'💬';
+}
+function closeWA(){
+  waOpen=false;
+  document.getElementById('waOptions').classList.remove('show');
+  document.getElementById('waMainBtn').textContent='💬';
+}
+document.addEventListener('click',e=>{
+  if(waOpen&&!document.getElementById('waChooser').contains(e.target))closeWA();
+});
+
+/* ───── WA NUMBERS ───── */
+const WA_NUMBERS=[
+  {num:'221774408219',label:'Contact 1 — +221 77 440 82 19'},
+  {num:'221781629372',label:'Contact 2 — +221 78 162 93 72'},
+];
+function buildWAMsg(){
+  return encodeURIComponent(
+    'Bonjour FOYS 👋\n\nJe voudrais commander :\n'
+    +cart.map(c=>`• ${c.name} — Taille ${c.size} x${c.qty} = FCFA ${(c.price*c.qty).toLocaleString()}`).join('\n')
+    +'\n\nTotal : FCFA '+cart.reduce((s,c)=>s+c.price*c.qty,0).toLocaleString()
+    +'\n\nMerci ! 🙏'
+  );
+}
+function renderWACoList(){
+  document.getElementById('waCoList').innerHTML=WA_NUMBERS.map((w,i)=>`
+    <a class="wa-co-btn" href="#" onclick="orderTo('${w.num}');return false">
+      <span class="waco-ico">📱</span>
+      <span class="waco-num">${w.label.replace(/.*—\s*/,'')}<small>${w.label.includes('—')?w.label.split('—')[0].trim():'Contact '+(i+1)}</small></span>
+      <span style="font-size:11px;color:var(--text3);letter-spacing:.08em;font-weight:400">Commander →</span>
+    </a>`).join('');
+}
+function checkoutWA(){
+  if(!cart.length)return;
+  closeCart();
+  renderWACoList();
+  document.getElementById('waCoOv').classList.add('open');
+  closeWA();
+}
+function closeWACo(){
+  document.getElementById('waCoOv').classList.remove('open');
+}
+function orderTo(num){
+  if(!cart.length){alert('Votre panier est vide !');closeWA();closeWACo();return;}
+  window.open('https://wa.me/'+num+'?text='+buildWAMsg(),'_blank');
+  closeWA();closeWACo();
+}
+
+
+const cur=document.getElementById('cur'), ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a)})();
+
+/* ───── NAV ───── */
+window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',scrollY>40));
+
+/* ───── TSHIRT SVG ───── */
+let _svgUid=0;
+function tshirtSVG(color){
+  const uid='sh'+(++_svgUid);
+  return `<svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg" class="tshirt-svg">
+    <defs>
+      <filter id="${uid}"><feDropShadow dx="0" dy="8" stdDeviation="14" flood-color="rgba(0,0,0,0.6)"/></filter>
+    </defs>
+    <path d="M 70 10 Q 80 8 100 8 Q 120 8 130 10 L 165 40 L 190 28 L 200 70 L 168 76 L 168 230 L 32 230 L 32 76 L 0 70 L 10 28 L 35 40 Z"
+      fill="${color}" filter="url(#${uid})" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+    <path d="M 70 10 Q 85 26 100 26 Q 115 26 130 10" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+  </svg>`;
+}
+
+/* ───── LOGO OVERLAY IMG ───── */
+function logoHTML(){
+  return `<img src="images/logo.png" class="tshirt-logo-overlay" alt="FOYS logo" style="filter:invert(1) brightness(3);mix-blend-mode:screen" onerror="this.style.display='none'">`;
+}
+function modalImgFallback(img,color){
+  if(img.dataset.fallback)return;
+  img.dataset.fallback='1';
+  img.style.display='none';
+  img.parentElement.innerHTML=`<div style="background:linear-gradient(160deg,${color}44,${color}11);min-height:360px;display:flex;align-items:center;justify-content:center;font-size:64px;opacity:.3">👕</div>`;
+}
+function imgFallback(img,color){
+  if(img.dataset.fallback)return;
+  img.dataset.fallback='1';
+  const parent=img.closest('.prod-img-wrap')||img.closest('.lb-item')||img.closest('.color-swatch')||img.parentElement;
+  if(parent&&parent.closest?.('.prod-card')){
+    const c=parent.closest('.prod-card');
+    const col=c?.querySelector('.cdot')?.style?.background||color||'#111';
+    img.style.display='none';
+    const wrap=document.createElement('div');
+    wrap.className='tshirt-visual';
+    wrap.style.background=col;
+    wrap.style.minHeight='280px';
+    wrap.innerHTML=tshirtSVG(col)+logoHTML();
+    parent.appendChild(wrap);
+  } else {
+    img.style.objectFit='contain';
+    img.style.padding='20px';
+    img.style.background=color||'#111';
+  }
+}
+
+/* ───── BUILD PRODUCTS ───── */
+function buildProducts(){
+  const g=document.getElementById('prodGrid');
+  PRODUCTS.forEach(p=>{
+    const c=document.createElement('div');
+    c.className='prod-card'+(p.feat?' feat':'');
+    c.dataset.cat = p.cat || 'tshirt';
+    c.dataset.pid = p.id;
+    c.innerHTML=`
+      <div class="prod-img-wrap">
+        <img src="${p.img}" alt="${p.name}" class="prod-real-img" loading="lazy" onerror="imgFallback(this,'${p.color}')">
+        ${p.tag?`<div class="prod-tag">${p.tag}</div>`:''}
+        ${p.oos?`<div class="prod-tag" style="left:auto;right:18px;background:#e74c3c">Non disponible</div>`:''}
+        <div class="prod-overlay"></div>
+      </div>
+      <div class="prod-info">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-sub">${p.sub}</div>
+        <div class="color-dots"><div class="cdot active" style="background:${p.color}"></div></div>
+        <div class="sizes-row">
+          ${p.oos?`<div style="font-size:11px;color:#e74c3c;letter-spacing:.15em;text-transform:uppercase;font-weight:600">Non disponible</div>`:p.sizes.map(s=>`<button class="sz" onclick="event.stopPropagation();pickSize(this,'${s}',${p.id})">${s}</button>`).join('')}
+        </div>
+        <div class="prod-bottom">
+          <div class="prod-price"><span class="cur">FCFA </span>${p.price.toLocaleString()}</div>
+          <button class="add-btn" onclick="event.stopPropagation();if(!${p.oos?1:0})addCart(${p.id},null)" ${p.oos?'disabled style="opacity:.25;cursor:not-allowed"':''}>${p.oos?'✕':'+'}</button>
+        </div>
+      </div>`;
+    c.addEventListener('click',()=>openModal(p.id));
+    g.appendChild(c);
+  });
+}
+
+/* ───── FILTER ───── */
+function goToFilter(filter){
+  document.getElementById('collection').scrollIntoView({behavior:'smooth'});
+  setTimeout(()=>filterProducts(filter),500);
+}
+function filterProducts(filter){
+  const btns=document.querySelectorAll('#filterBar .filter-btn');
+  btns.forEach(b=>b.classList.toggle('active',b.dataset.filter===filter));
+  document.querySelectorAll('#prodGrid .prod-card').forEach(c=>{
+    const cat=c.dataset.cat;
+    const tag=PRODUCTS.find(p=>p.id===Number(c.dataset.pid))?.tag;
+    const price=PRODUCTS.find(p=>p.id===Number(c.dataset.pid))?.price;
+    let show=true;
+    if(filter==='tshirt')show=cat==='tshirt';
+    else if(filter==='nouveautes')show=tag==='Nouveau';
+    else if(filter==='exclusif')show=tag==='Exclusif';
+    else if(filter==='promo')show=price<12500;
+    c.style.display=show?'':'none';
+  });
+}
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('#filterBar .filter-btn');
+  if(btn)filterProducts(btn.dataset.filter);
+});
+
+/* ───── COLORS GRID ───── */
+const COLORS_DATA = [
+  {name:'Noir',    hex:'#111111', img:'images/noir.jpg'},
+  {name:'Gris',    hex:'#4a4a4a', img:'images/gris.jpg'},
+  {name:'Navy',    hex:'#1a2744', img:'images/navy.jpg'},
+  {name:'Bordeaux',hex:'#5c1a28', img:'images/bordeaux.jpg'},
+  {name:'Beige',   hex:'#d4c5a9', img:'images/beige.jpg'},
+  {name:'Vert',    hex:'#2d5a3d', img:'images/vert.jpg'},
+  {name:'Bleu',    hex:'#4a7da8', img:'images/bleu.jpg'},
+];
+function buildColors(){
+  const g=document.getElementById('colorsGrid');
+  COLORS_DATA.forEach((c,i)=>{
+    const isBright = c.hex==='#d4c5a9'||c.hex==='#f0ece3'||c.hex==='#7a9e7e';
+    const div=document.createElement('div');
+    div.className='color-swatch';
+    if(c.img){
+      div.innerHTML=`
+        <img src="${c.img}" class="cs-bg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" alt="${c.name}" onerror="this.style.display='none'">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.15)"></div>
+        <span class="cs-name">${c.name}</span>`;
+    } else {
+      div.innerHTML=`
+        <div class="cs-bg" style="background:${c.hex};position:absolute;inset:0"></div>
+        <img src="images/logo.png" class="cs-logo" alt="FOYS" style="filter:invert(1) brightness(${isBright?0:10});mix-blend-mode:${isBright?'multiply':'screen'};opacity:0.65" onerror="this.style.display='none'">
+        <span class="cs-name" style="color:${isBright?'rgba(0,0,0,0.7)':'rgba(255,255,255,0.85)'}">${c.name}</span>`;
+    }
+    const match=PRODUCTS.find(p=>p.colorName===c.name)||PRODUCTS[0];
+    div.addEventListener('click',()=>openModal(match.id));
+    g.appendChild(div);
+  });
+}
+
+/* ───── LOOKBOOK ───── */
+const LOOKBOOK_ITEMS = [
+  {img:'images/noir.jpg',    name:'Signature Noir'},
+  {img:'images/gris.jpg',    name:'Urban Gris'},
+  {img:'images/navy.jpg',    name:'Deep Navy'},
+  {img:'images/bordeaux.jpg',name:'Bordeaux Prestige'},
+  {img:'images/beige.jpg',   name:'Beige Naturel'},
+  {img:'images/vert.jpg',    name:'Vert Nature'},
+  {img:'images/bleu.jpg',    name:'Bleu Ciel'},
+  {img:'images/bracelet.jpg',name:'Bracelet FOYS'},
+  {img:'images/bracelet-noire.jpg',name:'Bracelet FOYS Noir'},
+  {img:'images/lookbook-1.jpg',name:'Style FOYS'},
+  {img:'images/lookbook-2.jpg',name:'Look FOYS'},
+  {img:'images/sport.jpg',name:'Tenue Sport FOYS'},
+];
+function buildLookbook(){
+  const s=document.getElementById('lbScroll');
+  LOOKBOOK_ITEMS.forEach((item,i)=>{
+    const div=document.createElement('div');
+    div.className='lb-item';
+    div.innerHTML=`
+      <img src="${item.img}" class="lb-img" alt="${item.name}" loading="lazy" onerror="this.style.display='none'">
+      <div class="lb-num">0${i+1}</div>
+      <div class="lb-label">${item.name}</div>`;
+    s.appendChild(div);
+  });
+}
+
+/* ───── SIZE ───── */
+function pickSize(btn,sz,pid){
+  btn.closest('.prod-card').querySelectorAll('.sz').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  sizeMap[pid]=sz;
+}
+function pickModalSize(btn,sz){
+  document.querySelectorAll('#mSizes .sz').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  curSize=sz;
+}
+
+/* ───── MODAL ───── */
+function openModal(pid){
+  const p=PRODUCTS.find(x=>x.id===pid);
+  if(!p)return;
+  curModal=p; curSize=null;
+  document.getElementById('mCat').textContent=p.tag||'FOYS Collection';
+  document.getElementById('mName').textContent=p.name;
+  document.getElementById('mPrice').textContent='FCFA '+p.price.toLocaleString();
+  document.getElementById('mDesc').textContent=p.desc;
+  const imgSide=document.getElementById('modalImgSide');
+  if(p.img){
+    imgSide.innerHTML=`<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="modalImgFallback(this,'${p.color}')">`;
+  } else {
+    imgSide.innerHTML=`<div class="modal-ph" style="background:linear-gradient(160deg,${p.color}44,${p.color}11);min-height:360px;display:flex;align-items:center;justify-content:center;font-size:64px;opacity:.3">👕</div>`;
+  }
+  document.getElementById('mSizes').innerHTML=p.sizes.map(s=>`<button class="sz" onclick="pickModalSize(this,'${s}')">${s}</button>`).join('');
+  document.getElementById('modalOv').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(e){
+  if(e&&e.target!==document.getElementById('modalOv'))return;
+  document.getElementById('modalOv').classList.remove('open');
+  document.body.style.overflow='';
+  curModal=null;
+}
+document.getElementById('modalAddBtn').onclick=()=>{
+  if(curModal)addCart(curModal.id,curSize);
+  closeModal();
+};
+
+/* ───── CART ───── */
+function addCart(pid,size){
+  const p=PRODUCTS.find(x=>x.id===pid);
+  if(!p)return;
+  const sz=size||sizeMap[pid]||p.sizes[0];
+  const key=`${pid}-${sz}`;
+  const ex=cart.find(c=>c.key===key);
+  if(ex)ex.qty++;
+  else cart.push({key,pid,name:p.name,price:p.price,size:sz,color:p.color,qty:1});
+  renderCart();
+  showToast();
+}
+function updateQty(key,d){
+  const it=cart.find(c=>c.key===key);
+  if(!it)return;
+  if(d>0&&getStockMode()){
+    const sq=getStockQty(it.pid,it.size);
+    if(it.qty+d>sq){showToast();document.getElementById('toast').textContent='✗ Stock insuffisant';setTimeout(()=>document.getElementById('toast').textContent='✓ Ajouté au panier',2000);return;}
+  }
+  it.qty+=d;
+  if(it.qty<=0)cart=cart.filter(c=>c.key!==key);
+  renderCart();
+}
+function renderCart(){
+  const total=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const count=cart.reduce((s,c)=>s+c.qty,0);
+  document.getElementById('cartCount').textContent=count;
+  document.getElementById('cartTotal').textContent='FCFA '+total.toLocaleString();
+  const body=document.getElementById('cartBody');
+  body.querySelectorAll('.cart-item').forEach(e=>e.remove());
+  document.getElementById('cartEmpty').style.display=cart.length?'none':'flex';
+  cart.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cart-item';
+    d.innerHTML=`
+      <div class="ci-img">
+        <div style="width:100%;height:100%;background:${c.color};display:flex;align-items:center;justify-content:center">
+          <img src="images/logo.png" style="width:44px;filter:invert(1) brightness(10);mix-blend-mode:screen;opacity:.7" onerror="this.style.display='none'">
+        </div>
+      </div>
+      <div class="ci-info">
+        <div class="ci-name">${c.name}</div>
+        <div class="ci-sz">Taille: ${c.size}</div>
+        <div class="ci-qty">
+          <button class="qb" onclick="updateQty('${c.key}',-1)">−</button>
+          <span class="qn">${c.qty}</span>
+          <button class="qb" onclick="updateQty('${c.key}',1)">+</button>
+        </div>
+      </div>
+      <div class="ci-price">FCFA ${(c.price*c.qty).toLocaleString()}</div>`;
+    body.insertBefore(d,document.getElementById('cartEmpty'));
+  });
+}
+function openCart(){
+  document.getElementById('cartPanel').classList.add('open');
+  document.getElementById('cartOv').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeCart(){
+  document.getElementById('cartPanel').classList.remove('open');
+  document.getElementById('cartOv').classList.remove('open');
+  document.body.style.overflow='';
+}
+/* ───── TOAST ───── */
+function showToast(){
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+/* ───── NEWSLETTER ───── */
+function subscribNL(){
+  const v=document.getElementById('nlInput').value;
+  if(!v)return;
+  showToast();
+  document.getElementById('toast').textContent='✓ Merci pour votre inscription !';
+  document.getElementById('nlInput').value='';
+}
+
+/* ───── ADMIN ───── */
+let adminLogoCount=0;
+function logoClick(){
+  adminLogoCount++;
+  if(adminLogoCount>=7){
+    adminLogoCount=0;
+    const btn=document.getElementById('adminBtn');
+    btn.style.display='flex';
+    showToast();
+    document.getElementById('toast').textContent='⚙ Mode Admin activé';
+    setTimeout(()=>document.getElementById('toast').textContent='✓ Ajouté au panier',2000);
+  }
+}
+
+function toggleAdmin(){
+  const p=document.getElementById('adminPanel'),o=document.getElementById('adminOv');
+  const open=!p.classList.contains('open');
+  p.classList.toggle('open',open);o.classList.toggle('open',open);
+  if(open){renderAdminProdList();renderStockList();renderPromoList();}
+}
+function closeAdmin(e){
+  if(e&&e.target!==document.getElementById('adminOv'))return;
+  document.getElementById('adminPanel').classList.remove('open');
+  document.getElementById('adminOv').classList.remove('open');
+}
+function switchAdminTab(tab){
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  document.querySelectorAll('.admin-tab-content').forEach(c=>c.classList.toggle('active',c.id==='adminTab'+tab.charAt(0).toUpperCase()+tab.slice(1)));
+}
+
+/* ─── PRODUITS ─── */
+let _uploadedImg=null;
+
+function adminPreviewFile(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    _uploadedImg=e.target.result;
+    const preview=document.getElementById('afPreview');
+    preview.src=_uploadedImg;
+    preview.style.display='block';
+    document.getElementById('afUploadText').style.display='none';
+    document.getElementById('afImg').value='';
+  };
+  reader.readAsDataURL(file);
+}
+
+function adminClearImage(){
+  _uploadedImg=null;
+  const preview=document.getElementById('afPreview');
+  preview.style.display='none';
+  preview.src='';
+  document.getElementById('afUploadText').style.display='inline';
+  document.getElementById('afFileInput').value='';
+  document.getElementById('afImg').value='';
+}
+
+function adminAddProduct(){
+  const g=v=>document.getElementById('af'+v);
+  const name=g('Name').value,sub=g('Sub').value,price=Number(g('Price').value);
+  const tag=g('Tag').value||null,color=g('Color').value||'#111',colorName=g('ColorName').value||'';
+  const cat=g('Cat').value,img=_uploadedImg||g('Img').value||'images/noir.jpg';
+  const sizes=g('Sizes').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const desc=g('Desc').value,feat=g('Feat').checked;
+  const oos=g('Oos').checked;
+  if(!name||!price||!sizes.length){alert('Remplis le nom, le prix et les tailles');return;}
+  const id=Math.max(...PRODUCTS.map(p=>p.id),0)+1;
+  const np={id,name,sub,price,tag,cat,color,colorName,desc,sizes,feat,img,oos};
+  PRODUCTS.push(np);
+  saveProducts();
+  rebuildProducts();
+  renderAdminProdList();
+  g('Name').value='';g('Sub').value='';g('Price').value='';g('Tag').value='';
+  g('Color').value='';g('ColorName').value='';g('Img').value='';g('Sizes').value='';
+  g('Desc').value='';g('Feat').checked=false;g('Oos').checked=false;
+  adminClearImage();
+  showToast();document.getElementById('toast').textContent='✓ Produit ajouté';
+  setTimeout(()=>document.getElementById('toast').textContent='✓ Ajouté au panier',2000);
+}
+function adminDeleteProduct(id){
+  if(!confirm('Supprimer ce produit ?'))return;
+  const idx=PRODUCTS.findIndex(p=>p.id===id);
+  if(idx>-1){PRODUCTS.splice(idx,1);saveProducts();rebuildProducts();renderAdminProdList();}
+}
+function adminToggleOos(id,on){
+  const p=PRODUCTS.find(x=>x.id===id);
+  if(!p)return;
+  if(on)p.oos=true;else delete p.oos;
+  saveProducts();rebuildProducts();renderAdminProdList();
+}
+function renderAdminProdList(){
+  const el=document.getElementById('adminProdList');
+  el.innerHTML=PRODUCTS.map(p=>`<div class="admin-prod-item"><span class="api-name">${p.name}${p.oos?' <span style="color:#e74c3c;font-size:10px;font-weight:600">— NON DISPO</span>':''}</span><span class="api-price">FCFA ${p.price.toLocaleString()}</span><label class="admin-check" style="cursor:pointer" title="Non disponible"><input type="checkbox" ${p.oos?'checked':''} onchange="adminToggleOos(${p.id},this.checked)"> Non dispo</label><button class="admin-del-btn" onclick="adminDeleteProduct(${p.id})">✕</button></div>`).join('');
+}
+
+/* ─── STOCK ─── */
+function getStockMode(){return localStorage.getItem('foys-stock-mode')==='true'}
+function toggleStockMode(){
+  const on=document.getElementById('stockModeToggle').checked;
+  localStorage.setItem('foys-stock-mode',on);
+  document.getElementById('stockSection').style.display=on?'block':'none';
+  rebuildProducts();
+}
+function getStock(){try{return JSON.parse(localStorage.getItem('foys-stock'))||{}}catch(e){return{}}}
+function setStockItem(pid,size,val){
+  const s=getStock();const key=pid+'-'+size;
+  const q=Math.max(0,parseInt(val)||0);
+  if(q>0)s[key]=q;else delete s[key];
+  localStorage.setItem('foys-stock',JSON.stringify(s));
+  rebuildProducts();
+}
+function getStockQty(pid,size){
+  if(!getStockMode())return 999;
+  const s=getStock();return s[pid+'-'+size]??999;
+}
+function renderStockList(){
+  const el=document.getElementById('stockList');
+  const mode=getStockMode();
+  document.getElementById('stockModeToggle').checked=mode;
+  document.getElementById('stockSection').style.display=mode?'block':'none';
+  el.innerHTML=PRODUCTS.map(p=>`<div class="stock-item"><span class="si-name">${p.name}</span><div class="si-sizes">${p.sizes.map(s=>`<span class="si-sz">${s}: <input type="number" min="0" value="${getStock()[p.id+'-'+s]||''}" onchange="setStockItem(${p.id},'${s}',this.value)" placeholder="∞"></span>`).join('')}</div></div>`).join('');
+}
+
+/* ─── PROMOS ─── */
+function getPromos(){try{return JSON.parse(localStorage.getItem('foys-promos'))||{}}catch(e){return{}}}
+function setPromoPrice(pid,val){
+  const p=getPromos();const v=parseInt(val);
+  if(v>0)p[pid]=v;else delete p[pid];
+  localStorage.setItem('foys-promos',JSON.stringify(p));
+  rebuildProducts();
+}
+function getEffectivePrice(prod){
+  const p=getPromos();
+  return p[prod.id]||prod.price;
+}
+function renderPromoList(){
+  const el=document.getElementById('promoList');
+  const promos=getPromos();
+  el.innerHTML=PRODUCTS.map(p=>`<div class="promo-item"><span class="pi-name">${p.name}</span><span class="pi-price">Prix: FCFA ${p.price.toLocaleString()}</span><input type="number" min="0" placeholder="Prix promo" value="${promos[p.id]||''}" onchange="setPromoPrice(${p.id},this.value)"><span class="pi-orig">${promos[p.id]?'FCFA '+p.price.toLocaleString():''}</span></div>`).join('');
+}
+
+/* ───── MODIFIED BUILDS ───── */
+function rebuildProducts(){
+  const g=document.getElementById('prodGrid');
+  g.innerHTML='';
+  PRODUCTS.forEach(p=>{
+    const c=document.createElement('div');
+    c.className='prod-card'+(p.feat?' feat':'');
+    c.dataset.cat=p.cat||'tshirt';c.dataset.pid=p.id;
+    const price=getEffectivePrice(p);
+    const pm=getPromos()[p.id];
+    c.innerHTML=`
+      <div class="prod-img-wrap">
+        <img src="${p.img}" alt="${p.name}" class="prod-real-img" loading="lazy" onerror="imgFallback(this,'${p.color}')">
+        ${p.tag?`<div class="prod-tag">${p.tag}</div>`:''}
+        ${p.oos?`<div class="prod-tag" style="left:auto;right:18px;background:#e74c3c">Non disponible</div>`:''}
+        ${pm&&!p.oos?`<div class="prod-tag" style="left:auto;right:18px;background:#e74c3c">-${Math.round((1-pm/p.price)*100)}%</div>`:''}
+        <div class="prod-overlay"></div>
+      </div>
+      <div class="prod-info">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-sub">${p.sub}</div>
+        <div class="color-dots"><div class="cdot active" style="background:${p.color}"></div></div>
+        <div class="sizes-row">
+          ${p.oos?`<div style="font-size:11px;color:#e74c3c;letter-spacing:.15em;text-transform:uppercase;font-weight:600">Non disponible</div>`:p.sizes.map(s=>{
+            const sq=getStockQty(p.id,s);
+            const oos=getStockMode()&&sq<=0;
+            return `<button class="sz${oos?' out-of-stock':''}" onclick="event.stopPropagation();if(!this.classList.contains('out-of-stock'))pickSize(this,'${s}',${p.id})"${oos?' disabled':''}>${s}${getStockMode()?'<small style="font-size:7px;opacity:.5;display:block">'+sq+'</small>':''}</button>`;
+          }).join('')}
+        </div>
+        <div class="prod-bottom">
+          <div class="prod-price"><span class="cur">FCFA </span>${price.toLocaleString()}${pm?`<span style="font-size:12px;text-decoration:line-through;color:var(--text3);margin-left:6px;font-family:'Josefin Sans',sans-serif">${p.price.toLocaleString()}</span>`:''}</div>
+          <button class="add-btn" onclick="event.stopPropagation();if(!${p.oos?1:0})addCart(${p.id},null)" ${p.oos?'disabled style="opacity:.25;cursor:not-allowed"':''}>${p.oos?'✕':'+'}</button>
+        </div>
+      </div>`;
+    c.addEventListener('click',()=>openModal(p.id));
+    g.appendChild(c);
+  });
+  // re-apply active filter
+  const active=document.querySelector('#filterBar .filter-btn.active');
+  if(active)filterProducts(active.dataset.filter);
+}
+
+/* ───── OVERRIDE openModal & addCart for stock/promo ───── */
+const _origOpenModal=openModal;
+openModal=function(pid){
+  const p=PRODUCTS.find(x=>x.id===pid);
+  if(!p)return;
+  curModal=p;curSize=null;
+  document.getElementById('mCat').textContent=p.tag||'FOYS Collection';
+  document.getElementById('mName').textContent=p.name;
+  const price=getEffectivePrice(p);
+  const pm=getPromos()[p.id];
+  document.getElementById('mPrice').innerHTML='FCFA '+price.toLocaleString()+(pm?` <span style="font-size:16px;text-decoration:line-through;color:var(--text3)">FCFA ${p.price.toLocaleString()}</span>`:'');
+  document.getElementById('mDesc').textContent=p.desc;
+  const imgSide=document.getElementById('modalImgSide');
+  if(p.img){
+    imgSide.innerHTML=`<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="modalImgFallback(this,'${p.color}')">`;
+  } else {
+    imgSide.innerHTML=`<div class="modal-ph" style="background:linear-gradient(160deg,${p.color}44,${p.color}11);min-height:360px;display:flex;align-items:center;justify-content:center;font-size:64px;opacity:.3">👕</div>`;
+  }
+  document.getElementById('mSizes').innerHTML=p.oos
+    ?'<div style="font-size:12px;color:#e74c3c;letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:10px 0">Non disponible actuellement</div>'
+    :p.sizes.map(s=>{
+      const sq=getStockQty(p.id,s);
+      const oos=getStockMode()&&sq<=0;
+      return `<button class="sz${oos?' out-of-stock':''}" onclick="pickModalSize(this,'${s}')"${oos?' disabled':''}>${s}${getStockMode()?' <small>('+sq+')</small>':''}</button>`;
+    }).join('');
+  const mBtn=document.getElementById('modalAddBtn');
+  if(p.oos){mBtn.textContent='Non disponible';mBtn.style.opacity='.35';mBtn.style.cursor='not-allowed';mBtn.disabled=true;}
+  else{mBtn.textContent='Ajouter au panier';mBtn.style.opacity='';mBtn.style.cursor='';mBtn.disabled=false;}
+  document.getElementById('modalOv').classList.add('open');
+  document.body.style.overflow='hidden';
+};
+
+const _origAddCart=addCart;
+addCart=function(pid,size){
+  const p=PRODUCTS.find(x=>x.id===pid);
+  if(!p)return;
+  if(p.oos){showToast();document.getElementById('toast').textContent='✗ Produit non disponible';setTimeout(()=>document.getElementById('toast').textContent='✓ Ajouté au panier',2000);return;}
+  const sz=size||sizeMap[pid]||p.sizes[0];
+  const key=pid+'-'+sz;
+  if(getStockMode()){
+    const sq=getStockQty(pid,sz);
+    const inCart=cart.filter(c=>c.key===key).reduce((s,c)=>s+c.qty,0);
+    if(sq<=0||inCart>=sq){showToast();document.getElementById('toast').textContent='✗ Stock épuisé';setTimeout(()=>document.getElementById('toast').textContent='✓ Ajouté au panier',2000);return;}
+  }
+  const ex=cart.find(c=>c.key===key);
+  const price=getEffectivePrice(p);
+  if(ex)ex.qty++;
+  else cart.push({key,pid,name:p.name,price,size:sz,color:p.color,qty:1});
+  renderCart();
+  showToast();
+};
+
+const _origRenderCart=renderCart;
+renderCart=function(){
+  const total=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const count=cart.reduce((s,c)=>s+c.qty,0);
+  document.getElementById('cartCount').textContent=count;
+  document.getElementById('cartTotal').textContent='FCFA '+total.toLocaleString();
+  const body=document.getElementById('cartBody');
+  body.querySelectorAll('.cart-item').forEach(e=>e.remove());
+  document.getElementById('cartEmpty').style.display=cart.length?'none':'flex';
+  cart.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cart-item';
+    const sq=getStockQty(c.pid,c.size);
+    const lowStock=getStockMode()&&sq>0&&sq<=3;
+    d.innerHTML=`
+      <div class="ci-img">
+        <div style="width:100%;height:100%;background:${c.color};display:flex;align-items:center;justify-content:center">
+          <img src="images/logo.png" style="width:44px;filter:invert(1) brightness(10);mix-blend-mode:screen;opacity:.7" onerror="this.style.display='none'">
+        </div>
+      </div>
+      <div class="ci-info">
+        <div class="ci-name">${c.name}</div>
+        <div class="ci-sz">Taille: ${c.size}${lowStock?' <span style="color:#e74c3c;font-weight:600">(Plus que '+sq+')</span>':''}</div>
+        <div class="ci-qty">
+          <button class="qb" onclick="updateQty('${c.key}',-1)">−</button>
+          <span class="qn">${c.qty}</span>
+          <button class="qb" onclick="updateQty('${c.key}',1)">+</button>
+        </div>
+      </div>
+      <div class="ci-price">FCFA ${(c.price*c.qty).toLocaleString()}</div>`;
+    body.insertBefore(d,document.getElementById('cartEmpty'));
+  });
+};
+
+// Override buildProducts
+buildProducts=rebuildProducts;
+
+/* ───── DELIVERY ───── */
+function openDelivery(){
+  document.getElementById('deliveryOv').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDelivery(e){
+  if(e&&e.target!==document.getElementById('deliveryOv'))return;
+  document.getElementById('deliveryOv').classList.remove('open');
+  document.body.style.overflow='';
+}
+function submitDelivery(){
+  const nom=document.getElementById('delNom').value.trim();
+  const prenom=document.getElementById('delPrenom').value.trim();
+  const lieu=document.getElementById('delLieu').value.trim();
+  const tel=document.getElementById('delTel').value.trim();
+  if(!nom||!prenom||!lieu||!tel){alert('Veuillez remplir tous les champs');return;}
+  const msg=encodeURIComponent(
+    '🛍️ NOUVELLE COMMANDE FOYS 🛍️\n\n'
+    +'Nom: '+nom+'\nPrénom: '+prenom+'\nLieu: '+lieu+'\nTéléphone: '+tel+'\n\n'
+    +'Articles:\n'
+    +cart.map(c=>'• '+c.name+' — Taille '+c.size+' x'+c.qty+' = FCFA '+(c.price*c.qty).toLocaleString()).join('\n')
+    +'\n\nTotal: FCFA '+cart.reduce((s,c)=>s+c.price*c.qty,0).toLocaleString()
+    +'\n\nMerci ! 🙏'
+  );
+  window.open('https://wa.me/221781629372?text='+msg,'_blank');
+  closeDelivery();
+}
+
+/* ───── RETOURS / CHAT ───── */
+function loadChat(){try{return JSON.parse(localStorage.getItem('foys-chat'))||[]}catch(e){return[]}}
+function saveChat(m){localStorage.setItem('foys-chat',JSON.stringify(m))}
+function renderChat(){
+  const el=document.getElementById('chatMessages');
+  const msgs=loadChat();
+  el.innerHTML=msgs.length?msgs.map((m,i)=>'<div class=\"chat-msg\"><div class=\"chat-author\">'+m.author+'</div>'+m.text+'<button class=\"chat-del\" onclick=\"deleteChat('+i+')\">✕</button><div class=\"chat-date\">'+m.date+'</div></div>').join(''):'<p style=\"color:var(--text3);font-size:12px;text-align:center;padding:20px\">Aucun commentaire pour le moment. Soyez le premier !</p>';
+}
+function submitChat(){
+  const text=document.getElementById('chatInput').value.trim();
+  if(!text){alert('Écrivez un message');return;}
+  const msgs=loadChat();
+  msgs.push({author:'Client FOYS',text,date:new Date().toLocaleDateString('fr-FR')});
+  saveChat(msgs);
+  document.getElementById('chatInput').value='';
+  renderChat();
+  showToast();document.getElementById('toast').textContent='✓ Message envoyé';
+  setTimeout(()=>document.getElementById('toast').textContent='✓ Ajouté au panier',2000);
+}
+function deleteChat(i){
+  const msgs=loadChat();
+  msgs.splice(i,1);saveChat(msgs);renderChat();
+}
+function openRetours(){
+  document.getElementById('retoursOv').classList.add('open');
+  document.body.style.overflow='hidden';
+  renderChat();
+}
+function closeRetours(e){
+  if(e&&e.target!==document.getElementById('retoursOv'))return;
+  document.getElementById('retoursOv').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* ───── FAQ ───── */
+const FAQ_DATA = [
+  {
+    q: 'Qu\'est-ce que le développement personnel ?',
+    a: 'Le développement personnel est un processus continu de prise de conscience et d\'amélioration de soi. Il englobe la connaissance de soi, la gestion des émotions, la définition d\'objectifs et le dépassement de ses limites. FOYS incarne cette philosophie : chaque t-shirt est un rappel de se concentrer sur soi-même pour avancer.'
+  },
+  {
+    q: 'Comment FOYS m\'aide-t-il dans ma croissance personnelle ?',
+    a: 'FOYS n\'est pas qu\'une marque de vêtements. C\'est un état d\'esprit. Le symbole du loup représente la force intérieure, l\'indépendance et la détermination. Porter FOYS, c\'est s\'engager chaque jour à se rappeler ses objectifs et à rester concentré sur son chemin.'
+  },
+  {
+    q: 'Quels sont les piliers du développement personnel selon FOYS ?',
+    a: 'Chez FOYS, nous croyons en quatre piliers fondamentaux : 1) La connaissance de soi — comprendre qui tu es, 2) La discipline — agir chaque jour, 3) La résilience — se relever après chaque échec, 4) La vision — savoir où tu veux aller. Notre marque est le reflet de ces valeurs.'
+  },
+  {
+    q: 'Comment rester motivé au quotidien ?',
+    a: 'La motivation est le résultat de petites victoires quotidiennes. Fixe-toi des objectifs clairs, célèbre chaque progrès, entoure-toi de personnes qui te poussent vers le haut et n\'oublie jamais pourquoi tu as commencé. FOYS te rappelle de rester focus.'
+  },
+  {
+    q: 'Pourquoi le loup est-il le symbole de FOYS ?',
+    a: 'Le loup incarne la loyauté, le courage, l\'indépendance et la sagesse. Il avance seul quand nécessaire mais protège sa meute. Comme le loup, chaque personne qui porte FOYS est invitée à cultiver sa force intérieure tout en restant connectée à sa communauté.'
+  },
+  {
+    q: 'Comment intégrer la philosophie FOYS dans ma vie ?',
+    a: 'Commence par te poser chaque matin la question : \"Qu\'est-ce qui est vraiment important pour moi aujourd\'hui ?\" Élimine les distractions, priorise tes objectifs et agis avec intention. FOYS — Focus On Your Self — est un mantra quotidien pour une vie alignée avec tes valeurs.'
+  }
+];
+
+function buildFAQ(){
+  const el=document.getElementById('faqList');
+  el.innerHTML=FAQ_DATA.map((item,i)=>'<div class=\"faq-item\" onclick=\"toggleFAQ(this)\"><div class=\"faq-q\">'+item.q+'<span class=\"faq-arrow\">▼</span></div><div class=\"faq-a\">'+item.a+'</div></div>').join('');
+}
+function toggleFAQ(el){
+  el.classList.toggle('open');
+}
+function openFAQ(){
+  document.getElementById('faqOv').classList.add('open');
+  document.body.style.overflow='hidden';
+  buildFAQ();
+}
+function closeFAQ(e){
+  if(e&&e.target!==document.getElementById('faqOv'))return;
+  document.getElementById('faqOv').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* ───── INIT ───── */
+document.querySelector('.nav-logo')?.addEventListener('click',logoClick);
+buildProducts();
+buildColors();
+buildLookbook();
+</script>
+</body>
+</html>
